@@ -17,6 +17,18 @@ module.exports = function (content) {
 		regExp: query.regExp
 	});
 
+  let fileName = loaderUtils.interpolateName(this, '[name]', {
+		context: query.context || this.options.context,
+		content: content,
+		regExp: query.regExp
+  });
+
+  let pathName = loaderUtils.interpolateName(this, '[path]', {
+		context: query.context || this.options.context,
+		content: content,
+		regExp: query.regExp
+  });
+
 	extension = extension.toLowerCase();
 
 	let type = mimeType.lookup(extension),
@@ -37,7 +49,11 @@ module.exports = function (content) {
 		let url = JSON.stringify(`data:${type};charset=utf-8;base64,${data}`);
 
 		return `module.exports = ${url}`;
-	}
+  } else {
+    if (query.mod) {
+      return `module.exports = '/${query.mod}/${pathName}${fileName}.${extension}'`;
+    }
+  }
 
 	return fileLoader.call(this, content);
 }
